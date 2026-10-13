@@ -1,7 +1,10 @@
 import os
+import json
+import time
+
 import mysql.connector
 import redis
-from flask import Flask
+from flask import Flask, jsonify, request, send_file
 
 app = Flask(__name__)
 
@@ -37,3 +40,36 @@ def get_cache():
         socket_connect_timeout=2,
     )
 
+def check_db():
+    """check if the database is connected"""
+    try:
+        conn = get_db()
+        ok = conn.is_connected()
+        conn.close()
+        return "Connected" if ok else "Disconnected"
+    except Exception:
+        return "Disconnected"
+
+
+def check_cache():
+    """check if the cache is not disconnected"""
+    cache = get_cache()
+    if cache is None:
+        return "No aplica (dev)"
+    try:
+        return "Connected" if cache.ping() else "Disconnected"
+    except Exception:
+        return "Disconnected"
+
+
+@app.route("/status")
+def status():
+    db_status = check_db()
+    cache_status = check_cache()
+    return jsonify(
+        {
+            "environment": APP_ENV,
+            "database": db_status,
+            "cache": cache_status,
+        }
+    )
