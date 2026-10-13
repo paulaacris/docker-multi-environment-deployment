@@ -1,0 +1,41 @@
+# DEV: web + base de datos (sin caché)
+services:
+  web:
+    build: ./web # dockerfile inside web
+    ports: # only exposed port
+      - "${WEB_PORT}:5000" # flask listening : computer port to view the page
+    environment: # variables app.py needs to connect db 
+      - APP_ENV=dev
+      - DB_HOST=${DB_HOST}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    depends_on:
+      db:
+        condition: service_healthy # wait for MySQL is ready 
+    networks:
+      - internal_net
+
+  db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql     
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - internal_net   
+
+networks:
+  internal_net:
+
+volumes:
+  db_data:
