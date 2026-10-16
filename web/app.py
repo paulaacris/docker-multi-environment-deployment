@@ -21,6 +21,9 @@ DB_CONFIG = {
 REDIS_HOST = os.environ.get("REDIS_HOST")  # only in prod
 REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD")
 
+@app.route("/")
+def home():
+    return send_file("index.html")
 
 def get_db():
     """get configuration data and connect to MySQL"""
@@ -55,7 +58,7 @@ def check_cache():
     """check if the cache is not disconnected"""
     cache = get_cache()
     if cache is None:
-        return "No aplica (dev)"
+        return "Not applicable (dev)"
     try:
         return "Connected" if cache.ping() else "Disconnected"
     except Exception:
