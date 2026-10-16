@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Iniciales por Generación</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .type-grass { background-color: #78C850; color: white; }
+        .type-fire { background-color: #F08030; color: white; }
+        .type-water { background-color: #6890F0; color: white; }
+        .type-poison { background-color: #A040A0; color: white; }
+        .type-flying { background-color: #A890F0; color: white; }
+        .type-dark { background-color: #705848; color: white; }
+        .type-ghost { background-color: #705898; color: white; }
+        .type-fighting { background-color: #C03028; color: white; }
+        .pokemon-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen">
+
+    <header class="bg-red-600 text-white py-8 shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 flex items-center justify-between">
+            <h1 class="text-3xl font-extrabold tracking-tight">🔥💧🌿 Pokedex Iniciales</h1>
+            <p class="text-sm font-semibold opacity-90">Generaciones 1 a 9</p>
+        </div>
+    </header>
+
+    <section class="max-w-6xl mx-auto px-4 pt-8">
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold">Estado de los servicios</h2>
+                <span id="env-badge" class="text-xs font-bold px-3 py-1 rounded-full bg-gray-200 uppercase">...</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <div><p class="text-sm text-gray-500 mb-1">Aplicación web</p><span id="st-web" class="px-3 py-1 rounded-full text-sm font-bold">...</span></div>
+                <div><p class="text-sm text-gray-500 mb-1">Base de datos (MySQL)</p><span id="st-db" class="px-3 py-1 rounded-full text-sm font-bold">...</span></div>
+                <div><p class="text-sm text-gray-500 mb-1">Caché (Redis)</p><span id="st-cache" class="px-3 py-1 rounded-full text-sm font-bold">...</span></div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-100 mt-6">
+            <h2 class="text-xl font-bold mb-1">⭐ Mis Pokémon favoritos</h2>
+            <p class="text-sm text-gray-500 mb-4">Se guardan en MySQL. Origen de los datos: <span id="fav-origen" class="font-semibold">-</span></p>
+            <div class="flex gap-2 mb-4">
+                <input id="fav-input" maxlength="50" placeholder="Ej: Pikachu" class="flex-1 border border-gray-300 rounded-lg px-3 py-2">
+                <button id="fav-btn" class="bg-red-600 text-white font-bold px-4 py-2 rounded-lg hover:bg-red-700">Añadir</button>
+            </div>
+            <ul id="fav-list" class="list-disc pl-6 text-gray-700"></ul>
+            <p id="fav-error" class="text-red-600 text-sm mt-2"></p>
+        </div>
+    </section>
+
+
+    <main class="max-w-6xl mx-auto px-4 py-10" id="pokedex-container">
+        <!-- El contenido se genera por JS -->
+    </main>
+
+    <script>
+        // Datos de los iniciales
+        const generations = [
+            {
+                gen: 1, region: "Kanto",
+                starters: [
+                    { id: 1, name: "Bulbasaur", types: ["Grass", "Poison"], desc: "Una extraña semilla fue plantada en su espalda al nacer." },
+                    { id: 4, name: "Charmander", types: ["Fire"], desc: "La llama que tiene en la punta de la cola arde según sus sentimientos." },
+                    { id: 7, name: "Squirtle", types: ["Water"], desc: "Su caparazón no le sirve solo para protegerse, su forma aerodinámica le permite nadar rápido." }
+                ]
+            },
+            {
+                gen: 2, region: "Johto",
+                starters: [
+                    { id: 152, name: "Chikorita", types: ["Grass"], desc: "Usa la hoja de su cabeza para determinar la temperatura y la humedad." },
+                    { id: 155, name: "Cyndaquil", types: ["Fire"], desc: "Es tímido y siempre se enrosca como una bola. Si se asusta, su lomo arde." },
+                    { id: 158, name: "Totodile", types: ["Water"], desc: "A pesar de ser pequeño, sus mandíbulas son muy potentes." }
+                ]
+            },
+            {
+                gen: 3, region: "Hoenn",
+                starters: [
+                    { id: 252, name: "Treecko", types: ["Grass"], desc: "Tiene pequeños ganchos en las plantas de los pies que le permiten escalar paredes." },
+                    { id: 255, name: "Torchic", types: ["Fire"], desc: "Lleva fuego en su interior. Si lo abrazas, se siente muy calentito." },
+                    { id: 258, name: "Mudkip", types: ["Water"], desc: "La aleta de su cabeza actúa como un radar de gran precisión." }
+                ]
+            },
+            {
+                gen: 4, region: "Sinnoh",
+                starters: [
+                    { id: 387, name: "Turtwig", types: ["Grass"], desc: "Realiza la fotosíntesis con todo su cuerpo bañándose a la luz del sol." },
+                    { id: 390, name: "Chimchar", types: ["Fire"], desc: "El gas de su panza alimenta el fuego de su retaguardia, que ni la lluvia puede apagar." },
+                    { id: 393, name: "Piplup", types: ["Water"], desc: "Es muy orgulloso, por lo que odia aceptar comida de la gente." }
+                ]
+            },
+            {
+                gen: 5, region: "Teselia",
+                starters: [
+                    { id: 495, name: "Snivy", types: ["Grass"], desc: "Sintetiza la luz del sol mediante la cola. Si pierde energía, esta se comba." },
+                    { id: 498, name: "Tepig", types: ["Fire"], desc: "Esquiva ágilmente los ataques enemigos y lanza fuego por la nariz." },
+                    { id: 501, name: "Oshawott", types: ["Water"], desc: "La vieira de su ombligo no solo sirve como arma, también para cortar bayas." }
+                ]
+            },
+            {
+                gen: 6, region: "Kalos",
+                starters: [
+                    { id: 650, name: "Chespin", types: ["Grass"], desc: "La dura coraza que recubre su cabeza y su espalda lo protege de los impactos." },
+                    { id: 653, name: "Fennekin", types: ["Fire"], desc: "Mastica ramitas para cargarse de energía y emite aire caliente por sus orejas." },
+                    { id: 656, name: "Froakie", types: ["Water"], desc: "Las burbujas de su pecho y espalda le protegen de los ataques enemigos." }
+                ]
+            },
+            {
+                gen: 7, region: "Alola",
+                starters: [
+                    { id: 722, name: "Rowlet", types: ["Grass", "Flying"], desc: "Se acerca a sus enemigos volando en silencio y los ataca con patadas poderosas." },
+                    { id: 725, name: "Litten", types: ["Fire"], desc: "Su pelaje es rico en aceites y muy inflamable. Lo lame para acicalarse." },
+                    { id: 728, name: "Popplio", types: ["Water"], desc: "Crea globos de agua por la nariz y los usa en combate para realizar ataques acrobáticos." }
+                ]
+            },
+            {
+                gen: 8, region: "Galar",
+                starters: [
+                    { id: 810, name: "Grookey", types: ["Grass"], desc: "Cuando golpea con su baqueta, las plantas marchitas de los alrededores recuperan su color." },
+                    { id: 813, name: "Scorbunny", types: ["Fire"], desc: "Empieza a correr para elevar su temperatura corporal y despertar su energía ígnea." },
+                    { id: 816, name: "Sobble", types: ["Water"], desc: "Cuando se asusta, llora de tal forma que hace llorar a todos a su alrededor." }
+                ]
+            },
+            {
+                gen: 9, region: "Paldea",
+                starters: [
+                    { id: 906, name: "Sprigatito", types: ["Grass"], desc: "El dulce aroma que desprende su cuerpo cautiva a cualquiera." },
+                    { id: 909, name: "Fuecoco", types: ["Fire"], desc: "Las escamas cuadradas de su vientre absorben calor y lo transforman en energía." },
+                    { id: 912, name: "Quaxly", types: ["Water"], desc: "Tiene un carácter serio y es muy pulcro, por lo que detesta ensuciarse la cabeza." }
+                ]
+            }
+        ];
+
+        const container = document.getElementById('pokedex-container');
+
+        generations.forEach(gen => {
+            // Contenedor de la Generación
+            const genSection = document.createElement('section');
+            genSection.className = 'mb-16';
+
+            // Título de la Generación
+            const genTitle = document.createElement('h2');
+            genTitle.className = 'text-2xl font-bold mb-6 text-gray-700 border-b-2 border-gray-200 pb-2';
+            genTitle.innerHTML = `Generación ${gen.gen} <span class="text-lg font-normal text-gray-500 ml-2">(${gen.region})</span>`;
+            genSection.appendChild(genTitle);
+
+            // Grid para los 3 Pokémon
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-1 md:grid-cols-3 gap-8';
+
+            // Generando las tarjetas de cada Pokémon
+            gen.starters.forEach(poke => {
+                const imgUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${poke.id}.png`;
+                
+                const typeBadges = poke.types.map(t => 
+                    `<span class="px-3 py-1 text-xs font-bold rounded-full type-${t.toLowerCase()} uppercase shadow-sm inline-block mr-1">${t}</span>`
+                ).join('');
+
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl shadow-md p-6 pokemon-card transition-all duration-300 border border-gray-100 flex flex-col items-center text-center';
+                
+                card.innerHTML = `
+                    <div class="w-full flex justify-end">
+                        <span class="text-gray-400 font-bold text-sm">#${String(poke.id).padStart(3, '0')}</span>
+                    </div>
+                    <div class="relative w-40 h-40 mb-4 bg-gray-50 rounded-full flex items-center justify-center p-4">
+                        <img src="${imgUrl}" alt="${poke.name}" class="w-full h-full object-contain filter drop-shadow-md z-10 relative" loading="lazy">
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">${poke.name}</h3>
+                    <div class="mb-4 flex gap-1 justify-center">
+                        ${typeBadges}
+                    </div>
+                    <p class="text-gray-600 text-sm flex-grow">${poke.desc}</p>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            genSection.appendChild(grid);
+            container.appendChild(genSection);
+        });
+    </script>
+
+    <script>
+        function setBadge(id, text) {
+            const el = document.getElementById(id);
+            el.textContent = text;
+            const ok = text === 'Connected', ko = text === 'Disconnected';
+            el.className = 'px-3 py-1 rounded-full text-sm font-bold ' +
+                (ok ? 'bg-green-100 text-green-700' : ko ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600');
+        }
+
+        async function refreshStatus() {
+            try {
+                const d = await (await fetch('/status')).json();
+                setBadge('st-web', 'Connected');
+                setBadge('st-db', d.database);
+                setBadge('st-cache', d.cache);
+                document.getElementById('env-badge').textContent = d.environment;
+            } catch (e) {
+                setBadge('st-web', 'Disconnected');
+                setBadge('st-db', 'Disconnected');
+                setBadge('st-cache', 'Disconnected');
+            }
+        }
+
+        async function loadFavs() {
+            const list = document.getElementById('fav-list');
+            const err = document.getElementById('fav-error');
+            try {
+                const r = await fetch('/favoritos');
+                const d = await r.json();
+                if (!r.ok) throw new Error(d.error);
+                err.textContent = '';
+                document.getElementById('fav-origen').textContent = d.origen;
+                list.innerHTML = '';
+                d.items.forEach(i => {
+                    const li = document.createElement('li');
+                    li.textContent = i.nombre; 
+                    list.appendChild(li);
+                });
+            } catch (e) {
+                err.textContent = e.message || 'No se pudo cargar la lista';
+            }
+        }
+
+        document.getElementById('fav-btn').addEventListener('click', async () => {
+            const input = document.getElementById('fav-input');
+            if (!input.value.trim()) return;
+            const r = await fetch('/favoritos', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({nombre: input.value})
+            });
+            if (r.ok) input.value = '';
+            loadFavs();
+        });
+
+        refreshStatus(); loadFavs();
+        setInterval(refreshStatus, 5000);   // estado dinámico cada 5 s
+    </script>
+</body>
+</html>
