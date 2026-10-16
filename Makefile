@@ -59,3 +59,23 @@ add-db-dev:
 
 add-db-prod:
 	$(MAKE) add-db ENV=prod
+
+# shut down only db 
+stop-db:
+	docker compose -p practica-$(ENV) -f docker-compose.$(ENV).yml --env-file .env.$(ENV) stop db
+
+stop-db-dev:
+	$(MAKE) stop-db ENV=dev
+
+stop-db-prod:
+	$(MAKE) stop-db ENV=prod
+
+# start only db
+start-db:
+	docker compose -p practica-$(ENV) -f docker-compose.$(ENV).yml --env-file .env.$(ENV) start db
+
+start-db-dev:
+	$(MAKE) start-db ENV=dev
+
+start-db-prod:
+	$(MAKE) start-db ENV=prod
