@@ -21,6 +21,9 @@ DB_CONFIG = {
 REDIS_HOST = os.environ.get("REDIS_HOST")  # only in prod
 REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD")
 
+CACHE_KEY = "favoritos"
+CACHE_TTL = 30  # sec
+
 @app.route("/")
 def home():
     return send_file("index.html")
@@ -76,6 +79,45 @@ def status():
             "cache": cache_status,
         }
     )
+
+@app.route("/api/favoritos", methods=["GET"])
+def listar_favoritos():
+    cache = get_cache()
+
+    # with cache 
+    if cache:
+        try:
+            cached = cache.get(CACHE_KEY)
+            if cached:
+                return jsonify({
+                    "origen": "cache (Redis)", 
+                    "items": json.loads(cached)
+                })
+        except Exception:
+            pass  # if redis fails, try with db 
+
+    # with db
+    try:
+        conn = get_db()
+        cur = conn.cursor(dictionary=True) # data with format 
+        cur.execute("SELECT id, nombre, creado FROM favoritos ORDER BY id DESC")
+        result = cur.fetchall()
+        cur.close()
+        conn.close()
+    except Exception:
+        return jsonify({"error": "Base de datos no disponible"}), 503
+
+    # save in caché for the next time
+    if cache:
+        try:
+            cache.set(CACHE_KEY, json.dumps(result), ex=CACHE_TTL)
+        except Exception:
+            pass
+
+    return jsonify({
+        "origen": "base de datos (MySQL)", 
+        "items": result
+    })
 
 def init_db(retries=10):
     """create the favorites table when the web starts"""
