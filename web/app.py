@@ -77,5 +77,29 @@ def status():
         }
     )
 
+def init_db(retries=10):
+    """create the favorites table when the web starts"""
+    for _ in range(retries):
+        try:
+            conn = get_db()
+            cur = conn.cursor()
+            cur.execute(
+                "CREATE TABLE IF NOT EXISTS favoritos ("
+                "id INT AUTO_INCREMENT PRIMARY KEY,"
+                "nombre VARCHAR(50) NOT NULL,"
+                "creado TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
+            )
+            conn.commit()
+            cur.close()
+            conn.close()
+            print("Tabla 'favoritos' verificada/creada con éxito.")
+            return
+        except Exception:
+            # if MySQL is still starting up, wait 2s and rety
+            time.sleep(2)
+
+# execute the function upon startup
+init_db()
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
