@@ -22,7 +22,7 @@ REDIS_HOST = os.environ.get("REDIS_HOST")  # only in prod
 REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD")
 
 CACHE_KEY = "favoritos"
-CACHE_TTL = 30  # sec
+CACHE_TTL = 60  # sec
 
 @app.route("/")
 def home():
@@ -100,7 +100,7 @@ def listar_favoritos():
     try:
         conn = get_db()
         cur = conn.cursor(dictionary=True) # data with format 
-        cur.execute("SELECT id, nombre, creado FROM favoritos ORDER BY id DESC")
+        cur.execute("SELECT id, nombre FROM favoritos ORDER BY id DESC")
         result = cur.fetchall()
         cur.close()
         conn.close()
