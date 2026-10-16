@@ -41,6 +41,10 @@ stop-db:
 start-db:
 	$(DC) start db
 
+# show caché content
+show-cache:
+	docker compose -p practica-$(ENV) -f docker-compose.$(ENV).yml --env-file .env.$(ENV) exec cache sh -c 'redis-cli -a "$$REDIS_PASSWORD" --no-auth-warning GET favoritos'
+
 # pattern 
 %-dev:
 	$(MAKE) $* ENV=dev
