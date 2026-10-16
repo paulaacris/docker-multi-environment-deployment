@@ -80,7 +80,7 @@ def status():
         }
     )
 
-@app.route("/api/favoritos", methods=["GET"])
+@app.route("/favoritos", methods=["GET"])
 def listar_favoritos():
     cache = get_cache()
 
@@ -118,6 +118,34 @@ def listar_favoritos():
         "origen": "base de datos (MySQL)", 
         "items": result
     })
+
+@app.route("/favoritos", methods=["POST"])
+def crear_favorito():
+    nombre = ((request.get_json(silent=True) or {}).get("nombre") or "").strip()
+    if not 1 <= len(nombre) <= 50:
+        return jsonify({"error": "Nombre inválido (1-50 caracteres)"}), 400
+    if not nombre:
+        return jsonify({"error":"El nombre es obligatorio"}), 400
+
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO favoritos (nombre) VALUES (%s)", (nombre,))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception:
+        return jsonify({"error": "Base de datos no disponible"}), 503
+
+    # invalidate the cache, the data has changed
+    cache = get_cache()
+    if cache:
+        try:
+            cache.delete(CACHE_KEY)
+        except Exception:
+            pass
+
+    return jsonify({"ok": True}), 201
 
 def init_db(retries=10):
     """create the favorites table when the web starts"""
