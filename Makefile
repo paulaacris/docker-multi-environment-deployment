@@ -49,3 +49,13 @@ show-vol-dev:
 
 show-vol-prod:
 	$(MAKE) show-vol ENV=prod
+
+# add content to the db
+add-db:
+	docker compose -p practica-$(ENV) -f docker-compose.$(ENV).yml exec db sh -c 'mysql -u $$MYSQL_USER -p"$$MYSQL_PASSWORD" $$MYSQL_DATABASE -e "INSERT INTO favoritos (nombre) VALUES (\"Snorlax\"), (\"Charmander\"), (\"Squirtle\");"'
+
+add-db-dev:
+	$(MAKE) add-db ENV=dev
+
+add-db-prod:
+	$(MAKE) add-db ENV=prod
