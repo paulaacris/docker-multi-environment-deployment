@@ -37,7 +37,7 @@ status:
 	curl http://localhost:$(PORT)/status
 
 favoritos:
-	curl http://localhost:8080/favoritos
+	curl http://localhost:$(PORT)/favoritos
 
 check-ports:
 	docker ps --format "table {{.Names}}\t{{.Ports}}"
@@ -74,7 +74,7 @@ start-db:
 
 # show caché content
 show-cache:
-	docker compose -p practica-$(ENV) -f docker-compose.$(ENV).yml --env-file .env.$(ENV) exec cache sh -c 'redis-cli -a "$$REDIS_PASSWORD" --no-auth-warning GET favoritos'
+	$(DC) exec cache sh -c 'redis-cli -a "$$REDIS_PASSWORD" --no-auth-warning GET favoritos'
 
 # Apagar solo la caché
 stop-cache:

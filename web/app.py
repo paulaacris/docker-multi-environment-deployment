@@ -124,8 +124,6 @@ def crear_favorito():
     nombre = ((request.get_json(silent=True) or {}).get("nombre") or "").strip()
     if not 1 <= len(nombre) <= 50:
         return jsonify({"error": "Nombre inválido (1-50 caracteres)"}), 400
-    if not nombre:
-        return jsonify({"error":"El nombre es obligatorio"}), 400
 
     try:
         conn = get_db()
