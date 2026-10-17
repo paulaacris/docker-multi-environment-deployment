@@ -162,7 +162,7 @@ make clean-prod
 
 All commands work for both environments. Add `-dev` or `-prod` to the end of the command name.
 
-If you do not add a suffix, the command uses `dev` (`make up` is the same as `make up-dev`). Use the suffix always, to avoid mistakes. The only commands without a suffix is `make setup`, `make ps` and `make check-ports`.
+If you do not add a suffix, the command uses `dev` (`make up` is the same as `make up-dev`). Use the suffix always, to avoid mistakes. The only commands without a suffix are `make setup`, `make ps` and `make check-ports`.
 
 | Command | What it does |
 |---|---|
