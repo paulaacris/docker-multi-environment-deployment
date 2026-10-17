@@ -13,8 +13,8 @@ setup:
 	@docker info >/dev/null 2>&1 || { echo >&2 "Error: Docker no está en ejecución."; exit 1; }
 
 	@echo "Verifying environment files(.env)..."
-	@if [ ! -f .env.dev ]; then echo "WEB_PORT=5000\nDB_HOST=db\nMYSQL_USER=user\nMYSQL_PASSWORD=pass\nMYSQL_DATABASE=pokedex\nMYSQL_ROOT_PASSWORD=root" > .env.dev; echo ".env.dev creado con valores por defecto."; fi
-	@if [ ! -f .env.prod ]; then echo "WEB_PORT=8080\nDB_HOST=db\nMYSQL_USER=user\nMYSQL_PASSWORD=pass\nMYSQL_DATABASE=pokedex\nMYSQL_ROOT_PASSWORD=root\nREDIS_HOST=cache\nREDIS_PASSWORD=redispass" > .env.prod; echo ".env.prod creado con valores por defecto."; fi
+	@if [ ! -f .env.dev ]; then echo ".env.dev does not exist"
+	@if [ ! -f .env.prod ]; then echo ".env.prod does not exist"
 
 	@echo "Setting permissions on .env files..."
 	@chmod 600 .env.dev .env.prod
