@@ -2,7 +2,7 @@
 
 Practice 1 – Deployment of multi-environment applications  
 Universitat de les Illes Balears (UIB)  
-Author: `Paula Cristina Morro Negre`
+Author: Paula Cristina Morro Negre
 
 ## 1. Project description
 
@@ -41,7 +41,7 @@ flowchart LR
     U[Browser] -->|WEB_PORT| W[web - Flask]
     subgraph internal_net [Docker internal network]
         W --> D[(db - MySQL)]
-        W -. prod only .-> C[(cache - Redis)]
+        W -- prod only --> C[(cache - Redis)]
         D --- V[(volume db_data)]
     end
 ```
