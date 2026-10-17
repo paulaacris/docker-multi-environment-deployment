@@ -57,7 +57,7 @@ flowchart LR
 | Compose file | `docker-compose.dev.yml` | `docker-compose.prod.yml` |
 | Variables file | `.env.dev` | `.env.prod` |
 | Services | web, db | web, db, cache |
-| Cache | Not used (the page shows "No aplica (dev)") | Redis with password, entries expire after 60 s |
+| Cache | Not used (the page shows “Not applicable (dev)”) | Redis with password, entries expire after 60 s |
 | Web port | 5000 | 8080 |
 | Restart policy | none | `unless-stopped` |
 | Docker project name | `practica-dev` | `practica-prod` |
@@ -164,9 +164,9 @@ This stops and removes the containers and the network. The data stays in the vol
 If you also want to delete the data (the volume), use:
 
 ```bash
-make down-dev     
+make clean-dev     
 # or
-make down-prod     
+make clean-prod     
 ```
 
 ## 7. Makefile commands
@@ -183,13 +183,13 @@ If you do not add a suffix, the command uses `dev` (`make up` is the same as `ma
 | `make ps` | Check the health status of the containers |
 | `make status` | Check de connections  |
 | `make favoritos` | Displays the list of favorites and the origin |
-| `make ckeck-port` | Shows a list of active Docker ports and tests the network to prove that the web ports (5000, 8080) are open, while the database (3306) and cache (6379) ports are safely blocked from the outside |
+| `make check-port` | Shows a list of active Docker ports and tests the network to prove that the web ports (5000, 8080) are open, while the database (3306) and cache (6379) ports are safely blocked from the outside |
 | `make down-dev` / `make down-prod` | Stops and removes the containers and the network. **Data is kept** |
 | `make clean-dev` / `make clean-prod` | Same as `down`, but also **deletes the volume** (data is lost) |
 | `make add-db-dev` / `make add-db-prod` | Inserts three rows (Snorlax, Charmander, Squirtle) in the table `favoritos` |
 | `make show-db-dev` / `make show-db-prod` | Shows the content of the table `favoritos` (it also proves that the connection to MySQL works) |
-| `make show-vol-dev` / `make show-vol-prod` | Lists the files that MySQL keeps in `/var/lib/mysql` (the volume) |
-| `make stop-db-dev` / `make start-db-dev` | Stops / starts only the database (to test the status of the app) |
+| `make show-vol-dev` / `make show-vol-prod` | Shows the volumes that exist in Docker |
+| `make stop-db-dev` / `make stop-db-prod` / `make start-db-dev` / `make start-db-prod` | Stops / starts only the database (to test the status of the app) |
 | `make show-cache-prod` | Shows what Redis has saved under the key `favoritos` |
 | `make stop-cache-prod` / `make start-cache-prod` | Stops / starts only the cache |
 
@@ -228,7 +228,7 @@ Other details:
 The endpoint `GET /favoritos` works like this:
 
 1. If Redis is available, it looks for the list there. If it finds it, it answers with `"origen": "cache (Redis)"`.
-2. If not, it reads the list from MySQL, saves a copy in Redis for 30 seconds and answers with `"origen": "base de datos (MySQL)"`.
+2. If not, it reads the list from MySQL, saves a copy in Redis for 60 seconds and answers with `"origen": "base de datos (MySQL)"`.
 3. When a new favorite is added (`POST /favoritos`), the copy in Redis is deleted, so the next read gets fresh data.
 
 If Redis stops, the app keeps working and reads from MySQL.
@@ -315,7 +315,7 @@ make show-db-dev
 ```
 
 ```bash
-make show-db-dev    
+make show-db-prod    
 ```
 
 **Result:**
@@ -486,4 +486,4 @@ make favoritos # origin: cache (Redis)
 
 ## 13. Use of AI tools
 
-Claude was used for the implementation of the frontend (which was not the poinyof the practice), explication of Docker and makefile concepts and help with writing in English.
+Claude Sonnet 5.5 (Anthropic) was used for the implementation of the frontend (which was not the point of the practice), explication of Docker and makefile concepts and help with writing in English.
