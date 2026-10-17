@@ -13,8 +13,8 @@ setup:
 	@docker info >/dev/null 2>&1 || { echo >&2 "Error: Docker no está en ejecución."; exit 1; }
 
 	@echo "Verifying environment files(.env)..."
-	@if [ ! -f .env.dev ]; then echo ".env.dev does not exist"
-	@if [ ! -f .env.prod ]; then echo ".env.prod does not exist"
+	@[ -f .env.dev ] || { echo >&2 "Error: .env.dev does not exist"; exit 1; }
+	@[ -f .env.prod ] || { echo >&2 "Error: .env.prod does not exist"; exit 1; }
 
 	@echo "Setting permissions on .env files..."
 	@chmod 600 .env.dev .env.prod
