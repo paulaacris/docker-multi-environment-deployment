@@ -181,8 +181,8 @@ If you do not add a suffix, the command uses `dev` (`make up` is the same as `ma
 | `make build-dev` / `make build-prod` | Builds the images |
 | `make up-dev` / `make up-prod` | Builds the images and starts the containers |
 | `make ps` | Check the health status of the containers |
-| `make status` | Check de connections  |
-| `make favoritos` | Displays the list of favorites and the origin |
+| `make status-dev` / `make status-prod` | Check de connections  |
+| `make favoritos-dev` / `make favoritos-prod` | Displays the list of favorites and the origin |
 | `make check-port` | Shows a list of active Docker ports and tests the network to prove that the web ports (5000, 8080) are open, while the database (3306) and cache (6379) ports are safely blocked from the outside |
 | `make down-dev` / `make down-prod` | Stops and removes the containers and the network. **Data is kept** |
 | `make clean-dev` / `make clean-prod` | Same as `down`, but also **deletes the volume** (data is lost) |
