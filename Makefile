@@ -9,25 +9,42 @@ DC = docker compose -p practica-$(ENV) -f docker-compose.$(ENV).yml --env-file .
 
 setup: 
 	@echo "Checking Docker requirements..."
-	@command -v docker >/dev/null 2>&1 || { echo >&2 "		Error: Docker no está instalado."; exit 1; }
-	@docker info >/dev/null 2>&1 || { echo >&2 "		Error: Docker no está en ejecución."; exit 1; }
+	@command -v docker >/dev/null 2>&1 || { echo >&2 "Error: Docker no está instalado."; exit 1; }
+	@docker info >/dev/null 2>&1 || { echo >&2 "Error: Docker no está en ejecución."; exit 1; }
 
 	@echo "Verifying environment files(.env)..."
-	@if [ ! -f .env.dev ]; then echo "		WEB_PORT=8080\nAPP_ENV=dev\nDB_HOST=db\nMYSQL_USER=user\nMYSQL_PASSWORD=pass\nMYSQL_DATABASE=pokedex\nMYSQL_ROOT_PASSWORD=root" > .env.dev; echo ".env.dev creado con valores por defecto."; fi
-	@if [ ! -f .env.prod ]; then echo "		WEB_PORT=80\nAPP_ENV=prod\nDB_HOST=db\nMYSQL_USER=user\nMYSQL_PASSWORD=pass\nMYSQL_DATABASE=pokedex\nMYSQL_ROOT_PASSWORD=root\nREDIS_HOST=cache\nREDIS_PASSWORD=redispass" > .env.prod; echo ".env.prod creado con valores por defecto."; fi
+	@if [ ! -f .env.dev ]; then echo "WEB_PORT=5000\nDB_HOST=db\nMYSQL_USER=user\nMYSQL_PASSWORD=pass\nMYSQL_DATABASE=pokedex\nMYSQL_ROOT_PASSWORD=root" > .env.dev; echo ".env.dev creado con valores por defecto."; fi
+	@if [ ! -f .env.prod ]; then echo "WEB_PORT=8080\nDB_HOST=db\nMYSQL_USER=user\nMYSQL_PASSWORD=pass\nMYSQL_DATABASE=pokedex\nMYSQL_ROOT_PASSWORD=root\nREDIS_HOST=cache\nREDIS_PASSWORD=redispass" > .env.prod; echo ".env.prod creado con valores por defecto."; fi
+
+	@echo "Setting permissions on .env files..."
+	@chmod 600 .env.dev .env.prod
 
 	@echo "Setup complete. Start with 'make up-dev' or 'make up-prod'."
 
-# for local testing 
-virtual-env:
-	@echo Creando el entorno virtual en $(WEB_DIR)...
-	python3 -m venv $(VENV)
-	@echo "Actualizando pip e instalando dependencias..."
-	$(PIP) install -r $(WEB_DIR)/requirements.txt
+build:
+	$(DC) build
 
 up: 
+	@chmod 600 .env.$(ENV)
 	$(DC) up -d --build
 	@echo "Listo: http://localhost:$(PORT)"
+
+# healthy 
+ps: 
+	docker ps --format "table {{.Names}}\t{{.Status}}"
+
+status:
+	curl http://localhost:$(PORT)/status
+
+favoritos:
+	curl http://localhost:8080/favoritos
+
+check-ports:
+	docker ps --format "table {{.Names}}\t{{.Ports}}"
+	-nc -zv localhost 5000
+	-nc -zv localhost 8080
+	-nc -zv localhost 3306
+	-nc -zv localhost 6379
 
 down: 
 	$(DC) down
@@ -36,9 +53,9 @@ down:
 show-db: 
 	$(DC) exec db sh -c 'mysql -u $$MYSQL_USER -p"$$MYSQL_PASSWORD" $$MYSQL_DATABASE -e "SELECT * FROM favoritos;"'
 
-# show vol content (table favoritos)
+# show vols in docker
 show-vol:
-	$(DC) exec db ls -la /var/lib/mysql
+	docker volume ls
 
 clean: 
 	$(DC) down -v
