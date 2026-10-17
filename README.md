@@ -129,18 +129,7 @@ The variables are:
 make setup
 ```
 
-This command checks that Docker is installed and running, and that the files .env.dev and .env.prod exist. If one of them is missing, it creates it in the root of the project with default values:
-
-| Variable | .env.dev | .env.prod
-|---|---|---|---|
-| WEB_PORT | 5000 | 8080
-| DB_HOST | db | db
-| MYSQL_USER | user | user
-| MYSQL_PASSWORD | pass | pass
-| MYSQL_DATABASE | pokedex | pokedex
-| MYSQL_ROOT_PASSWORD | root | root
-| REDIS_HOST | - | cache
-| REDIS_PASSWORD | - | redispass
+This command checks that Docker is installed and running, and that the files .env.dev and .env.prod exist.
 
 **4. Start an environment**
 
@@ -173,17 +162,17 @@ make clean-prod
 
 All commands work for both environments. Add `-dev` or `-prod` to the end of the command name.
 
-If you do not add a suffix, the command uses `dev` (`make up` is the same as `make up-dev`). Use the suffix always, to avoid mistakes. The only command without a suffix is `make setup`.
+If you do not add a suffix, the command uses `dev` (`make up` is the same as `make up-dev`). Use the suffix always, to avoid mistakes. The only commands without a suffix is `make setup`, `make ps` and `make check-ports`.
 
 | Command | What it does |
 |---|---|
-| `make setup` | Checks that Docker is installed and running, and creates `.env.dev` / `.env.prod` with default values if they do not exist |
+| `make setup` | Checks that Docker is installed and running, and checks if `.env.dev` and `.env.prod` exist |
 | `make build-dev` / `make build-prod` | Builds the images |
 | `make up-dev` / `make up-prod` | Builds the images and starts the containers |
 | `make ps` | Check the health status of the containers |
 | `make status-dev` / `make status-prod` | Check de connections  |
 | `make favoritos-dev` / `make favoritos-prod` | Displays the list of favorites and the origin |
-| `make check-port` | Shows a list of active Docker ports and tests the network to prove that the web ports (5000, 8080) are open, while the database (3306) and cache (6379) ports are safely blocked from the outside |
+| `make check-ports` | Shows a list of active Docker ports and tests the network to prove that the web ports (5000, 8080) are open, while the database (3306) and cache (6379) ports are safely blocked from the outside |
 | `make down-dev` / `make down-prod` | Stops and removes the containers and the network. **Data is kept** |
 | `make clean-dev` / `make clean-prod` | Same as `down`, but also **deletes the volume** (data is lost) |
 | `make add-db-dev` / `make add-db-prod` | Inserts three rows (Snorlax, Charmander, Squirtle) in the table `favoritos` |
@@ -389,7 +378,7 @@ make stop-db-dev
 ```
 
 ```bash
-make status        
+make status-dev        
 ```
 
 **Result:**
@@ -443,7 +432,7 @@ make show-cache-prod  # empty, nothing is cached yet
 ```
 
 ```bash
-make favoritos # origin: base de datos (MySQL) 
+make favoritos-prod # origin: base de datos (MySQL) 
 ```
 
 **Result:**
@@ -461,7 +450,7 @@ make show-cache-prod # now Redis has a copy of the list
 ```
 
 ```bash
-make favoritos # origin: cache (Redis)
+make favoritos-prod # origin: cache (Redis)
 ```
 
 **Result:**
