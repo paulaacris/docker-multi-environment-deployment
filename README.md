@@ -22,8 +22,8 @@ The web page shows the status of the web, the database and the cache.
 .
 ├── docker-compose.dev.yml     # dev environment (web + db)
 ├── docker-compose.prod.yml    # prod environment (web + db + cache)
-├── .env.dev                   # variables for dev
-├── .env.prod                  # variables for prod
+├── .env.dev                   # variables for dev (not in git)
+├── .env.prod                  # variables for prod (not in git)
 ├── Makefile                   # commands to build, start, stop and test
 ├── .gitignore                 # keeps the .env files out of git
 └── web/
@@ -471,6 +471,7 @@ make favoritos-prod # origin: cache (Redis)
 
 - **`port is already allocated`**: another program uses that port. Change `WEB_PORT` in the `.env` file.
 - **`make setup` says Docker is not installed or not running**: install Docker, or start Docker Desktop / the Docker service, and run the command again.
+- **`make setup` says Error: .env.prod does not exist**: create the file following step 2.
 - **I changed the database password but it does not work**: MySQL only reads the password the first time it creates the volume. Run `make clean-dev` (or `clean-prod`) and start again (this deletes the data).
 
 ## 13. Use of AI tools
